@@ -1,0 +1,8 @@
+.entry__form{
+    margin: 0 auto;
+    padding-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 358px;
+}
