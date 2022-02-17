@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 
 import Header from './Header.js';
@@ -7,13 +7,14 @@ import Main from './Main.js';
 import Footer from './Footer.js';
 import Login from './Login.js';
 import Register from './Register.js';
-import InfoTooltip from './InfoTooltip.js';
+//import InfoTooltip from './InfoTooltip.js';
 import ImagePopup from './ImagePopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
 import { api } from '../utils/Api.js';
+import * as auth from '../auth.js';
 
 function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
@@ -21,6 +22,8 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
   const [cards, setCards] = React.useState([]);
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  //const navigate = React.useNavigate();
 
   const [currentUser, setCurrentUser] = React.useState({});
 
@@ -101,15 +104,42 @@ function App() {
       .catch((err) => console.log(err))
   }, [])
 
+
+//регистрация и авторизация
+React.useEffect(()=>{
+  if (loggedIn){
+    navigate('/');
+  }
+}, [loggedIn, navigate])
+
+const handleLogin = (formData) => {
+  auth.authorize(formData.email, formData.password)
+    .then((data) => {
+      localStorage.setItem('jwt', data.jwt);
+      setLoggedIn(true);
+      //navigate('/');
+    })
+    .catch(err => console.log(err));
+}
+// const handleRegistration = (formData) => {
+//   if (formData.password === formData.confirmPassword) {
+//     auth.register(formData.username, formData.password, formData.email, formData.calGoal)
+//       .then((res) => {
+//         navigate("/login");
+//       })
+//       .catch(err => console.log(err));
+//   }
+// }
+
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <BrowserRouter>
         <div className="page">
           <Header />
-          <Route path="/sign-in">
-            <Login />
-          </Route>
-          <Route path="/sign-up">
+          <Switch>
+          <Route path="/signin" element={<Login handleLogin={handleLogin} />} /> 
+          <Route path="/signup">
             <Register />
           </Route>
 
@@ -125,6 +155,7 @@ function App() {
             />
             <Footer />
             </ProtectedRoute>
+            </Switch>
 
 
           {/* попап редактирования профиля */}
