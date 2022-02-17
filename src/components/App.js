@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, useHistory } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 
 import Header from './Header.js';
@@ -23,7 +23,7 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
-  //const navigate = React.useNavigate();
+  const history = useHistory();
 
   const [currentUser, setCurrentUser] = React.useState({});
 
@@ -105,31 +105,31 @@ function App() {
   }, [])
 
 
-//регистрация и авторизация
-React.useEffect(()=>{
-  if (loggedIn){
-    navigate('/');
-  }
-}, [loggedIn, navigate])
+  //регистрация и авторизация
+  React.useEffect(() => {
+    if (loggedIn) {
+      history.push('/');
+    }
+  }, [loggedIn, history])
 
-const handleLogin = (formData) => {
-  auth.authorize(formData.email, formData.password)
-    .then((data) => {
-      localStorage.setItem('jwt', data.jwt);
-      setLoggedIn(true);
-      //navigate('/');
-    })
-    .catch(err => console.log(err));
-}
-// const handleRegistration = (formData) => {
-//   if (formData.password === formData.confirmPassword) {
-//     auth.register(formData.username, formData.password, formData.email, formData.calGoal)
-//       .then((res) => {
-//         navigate("/login");
-//       })
-//       .catch(err => console.log(err));
-//   }
-// }
+  const handleLogin = (formData) => {
+    auth.authorize(formData.email, formData.password)
+      .then((data) => {
+        localStorage.setItem('jwt', data.jwt);
+        setLoggedIn(true);
+        history.push('/');
+      })
+      .catch(err => console.log(err));
+  }
+  // const handleRegistration = (formData) => {
+  //   if (formData.password === formData.confirmPassword) {
+  //     auth.register(formData.username, formData.password, formData.email, formData.calGoal)
+  //       .then((res) => {
+  //         navigate("/login");
+  //       })
+  //       .catch(err => console.log(err));
+  //   }
+  // }
 
 
   return (
@@ -138,24 +138,26 @@ const handleLogin = (formData) => {
         <div className="page">
           <Header />
           <Switch>
-          <Route path="/signin" element={<Login handleLogin={handleLogin} />} /> 
-          <Route path="/signup">
-            <Register />
-          </Route>
+            <Route path="/signin">
+              <Login handleLogin={handleLogin} />
+            </Route>
+            <Route path="/signup">
+              <Register />
+            </Route>
 
-          <ProtectedRoute path="/">
-            <Main
-              cards={cards}
-              onEditAvatar={handleEditAvatarClick}
-              onEditProfile={handleEditProfileClick}
-              onAddPlace={handleAddPlaceClick}
-              onCardClick={handleCardClick}
-              onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
-            />
-            <Footer />
+            <ProtectedRoute path="/">
+              <Main
+                cards={cards}
+                onEditAvatar={handleEditAvatarClick}
+                onEditProfile={handleEditProfileClick}
+                onAddPlace={handleAddPlaceClick}
+                onCardClick={handleCardClick}
+                onCardLike={handleCardLike}
+                onCardDelete={handleCardDelete}
+              />
+              <Footer />
             </ProtectedRoute>
-            </Switch>
+          </Switch>
 
 
           {/* попап редактирования профиля */}
