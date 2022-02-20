@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 function Login({ handleLogin }) {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = React.useState({
         email: '',
         password: ''
     });
@@ -25,7 +25,7 @@ function Login({ handleLogin }) {
 
     return (
         <div className="login">
-            <form onSubmit={handleSubmit} className="login__form" name="login" onSubmit="">
+            <form onSubmit={handleSubmit} className="login__form" name="login">
                 <h1 className="login__title">Вход</h1>
                 <input
                     value={formData.email}

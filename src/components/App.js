@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch, useHistory } from 'react-router-dom';
+import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 
 import Header from './Header.js';
@@ -23,7 +23,7 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = React.useState({});
 
@@ -108,44 +108,44 @@ function App() {
   //регистрация и авторизация
   React.useEffect(() => {
     if (loggedIn) {
-      history.push('/');
+      navigate('/');
     }
-  }, [loggedIn, history])
+  }, [loggedIn, navigate])
 
   const handleLogin = (formData) => {
     auth.authorize(formData.email, formData.password)
       .then((data) => {
         localStorage.setItem('jwt', data.jwt);
         setLoggedIn(true);
-        history.push('/');
+        navigate('/');
       })
       .catch(err => console.log(err));
   }
-  // const handleRegistration = (formData) => {
-  //   if (formData.password === formData.confirmPassword) {
-  //     auth.register(formData.username, formData.password, formData.email, formData.calGoal)
-  //       .then((res) => {
-  //         navigate("/login");
-  //       })
-  //       .catch(err => console.log(err));
-  //   }
-  // }
-
+  const handleRegistration = (formData) => {
+    auth.register(formData.email, formData.password)
+      .then((res) => {
+        navigate('/sign-in');
+      })
+      .catch(err => console.log(err));
+  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <BrowserRouter>
-        <div className="page">
-          <Header />
-          <Switch>
-            <Route path="/signin">
-              <Login handleLogin={handleLogin} />
-            </Route>
-            <Route path="/signup">
-              <Register />
-            </Route>
+      <div className='page'>
+        <Header />
+        <Routes>
+          <Route
+            path='/sign-in'
+            element={<Login handleLogin={handleLogin} />} />
+          <Route
+            path='/sign-up'
+            element={<Register handleRegistration={handleRegistration} />} />
+          <Route
+            path='/'
+            element={loggedIn ? <Navigate to='/' /> : <Navigate to='/sign-in' />} />
 
-            <ProtectedRoute path="/">
+          <Route path='/' element={
+            <ProtectedRoute loggedIn={loggedIn}>
               <Main
                 cards={cards}
                 onEditAvatar={handleEditAvatarClick}
@@ -155,45 +155,44 @@ function App() {
                 onCardLike={handleCardLike}
                 onCardDelete={handleCardDelete}
               />
-              <Footer />
             </ProtectedRoute>
-          </Switch>
+          } />
+        </Routes>
+        <Footer />
 
 
-          {/* попап редактирования профиля */}
-          <EditProfilePopup
-            isOpen={isEditProfilePopupOpen}
-            onClose={closeAllPopups}
-            onUpdateUser={handleUpdateUser}
-          />
-
-          {/* попап редактирования аватара */}
-          <EditAvatarPopup
-            isOpen={isEditAvatarPopupOpen}
-            onClose={closeAllPopups}
-            onUpdateAvatar={handleUpdateAvatar}
-          />
-
-          {/* попап добавления карточки */}
-          <AddPlacePopup
-            isOpen={isAddPlacePopupOpen}
-            onClose={closeAllPopups}
-            onAddPlace={handleAddPlaceSubmit}
-          />
-
-          {/* <InfoTooltip 
-          isOpen="true"
-          /> */}
-
-        </div>
-
-        <ImagePopup
-          card={selectedCard}
+        {/* попап редактирования профиля */}
+        <EditProfilePopup
+          isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
+          onUpdateUser={handleUpdateUser}
         />
 
+        {/* попап редактирования аватара */}
+        <EditAvatarPopup
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+          onUpdateAvatar={handleUpdateAvatar}
+        />
 
-      </BrowserRouter>
+        {/* попап добавления карточки */}
+        <AddPlacePopup
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+          onAddPlace={handleAddPlaceSubmit}
+        />
+
+        {/* <InfoTooltip 
+          isOpen='true'
+          /> */}
+
+      </div>
+
+      <ImagePopup
+        card={selectedCard}
+        onClose={closeAllPopups}
+      />
+
     </CurrentUserContext.Provider>
   )
 }
