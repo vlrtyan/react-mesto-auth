@@ -5,12 +5,13 @@ const HEADERS = {
     'Content-Type': 'application/json'
 };
 
-// const getJson = (response) => {
-//     if (response.ok) {
-//         return response.json();
-//     }
-//     throw new Error({ status: response.status });
-//}
+const getResponseData = (res) => {
+    if (res.ok) {
+        return res.json();
+    } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+    }
+}
 
 export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
@@ -20,13 +21,7 @@ export const register = (email, password) => {
             email, password
         })
     })
-        .then((response) => {
-            return response.json();
-        })
-        .then((res) => {
-            return res;
-        })
-        .catch((err) => console.log(err));
+        .then(getResponseData)
 };
 
 export const authorize = (email, password) => {
@@ -37,14 +32,7 @@ export const authorize = (email, password) => {
             email, password
         })
     })
-        .then((response) => {
-            return response.json();
-        })
-        .then((res) => {
-            return res;
-        })
-        .catch((err) => console.log(err));
-    // .then(getJson)
+        .then(getResponseData)
 };
 export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
@@ -54,5 +42,5 @@ export const checkToken = (token) => {
             'Authorization': `Bearer ${token}`,
         }
     })
-    // .then(getJson)
+        .then(getResponseData)
 }

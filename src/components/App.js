@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, useNavigate, Navigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 
 import Header from './Header.js';
@@ -27,6 +27,44 @@ function App() {
 
   const [currentUser, setCurrentUser] = React.useState({});
 
+   //регистрация и авторизация
+
+  React.useEffect(() => {
+    if (localStorage.getItem('jwt')) {
+      const jwt = localStorage.getItem('jwt');
+      auth.checkToken(jwt).then((res) => {
+        if (res) {
+          setLoggedIn(true);
+        }
+      })
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (loggedIn) {
+      navigate('/');
+    }
+  }, [])
+
+  const handleLogin = (formData) => {
+    auth.authorize(formData.email, formData.password)
+      .then((data) => {
+        localStorage.setItem('jwt', data.jwt);
+        setLoggedIn(true);
+        navigate('/');
+      })
+      .catch(err => console.log(err));
+  }
+
+  const handleRegistration = (formData) => {
+    auth.register(formData.email, formData.password)
+      .then((res) => {
+        navigate('/sign-in');
+      })
+      .catch(err => console.log(err));
+  }
+
+  //отрисовка страницы
   const handleEditAvatarClick = () => {
     setEditAvatarPopupOpen(true);
   }
@@ -105,44 +143,13 @@ function App() {
   }, [])
 
 
-  //регистрация и авторизация
-  React.useEffect(() => {
-    if (loggedIn) {
-      navigate('/');
-    }
-  }, [loggedIn, navigate])
-
-  const handleLogin = (formData) => {
-    auth.authorize(formData.email, formData.password)
-      .then((data) => {
-        localStorage.setItem('jwt', data.jwt);
-        setLoggedIn(true);
-        navigate('/');
-      })
-      .catch(err => console.log(err));
-  }
-  const handleRegistration = (formData) => {
-    auth.register(formData.email, formData.password)
-      .then((res) => {
-        navigate('/sign-in');
-      })
-      .catch(err => console.log(err));
-  }
+ 
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className='page'>
         <Header />
         <Routes>
-          <Route
-            path='/sign-in'
-            element={<Login handleLogin={handleLogin} />} />
-          <Route
-            path='/sign-up'
-            element={<Register handleRegistration={handleRegistration} />} />
-          <Route
-            path='/'
-            element={loggedIn ? <Navigate to='/' /> : <Navigate to='/sign-in' />} />
 
           <Route path='/' element={
             <ProtectedRoute loggedIn={loggedIn}>
@@ -157,6 +164,12 @@ function App() {
               />
             </ProtectedRoute>
           } />
+          <Route
+            path='/sign-in'
+            element={<Login handleLogin={handleLogin} />} />
+          <Route
+            path='/sign-up'
+            element={<Register handleRegistration={handleRegistration} />} />
         </Routes>
         <Footer />
 
