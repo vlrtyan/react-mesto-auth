@@ -20,6 +20,8 @@ function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
+  const [isTooltipOpen, setTooltipOpen] = React.useState(false);
+  const [isTooltipSuccessful, setTooltipSuccessful] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
@@ -27,17 +29,17 @@ function App() {
 
   const [currentUser, setCurrentUser] = React.useState({});
 
-   //регистрация и авторизация
+  //регистрация и авторизация
 
   React.useEffect(() => {
     if (localStorage.getItem('jwt')) {
       const jwt = localStorage.getItem('jwt');
       auth.checkToken(jwt)
-      .then((res) => {
-        if (res) {
-          setLoggedIn(true);
-        }
-      })
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+          }
+        })
     }
   }, []);
 
@@ -54,15 +56,26 @@ function App() {
         setLoggedIn(true);
         navigate('/');
       })
-      .catch(err => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setTooltipSuccessful(false);
+        setTooltipOpen(true);
+      });
+      
   }
 
   const handleRegistration = (formData) => {
     auth.register(formData.email, formData.password)
       .then((res) => {
+        setTooltipSuccessful(true);
+        setTooltipOpen(true);
         navigate('/sign-in');
       })
-      .catch(err => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setTooltipSuccessful(false);
+        setTooltipOpen(true);
+      });
   }
 
   //отрисовка страницы
@@ -82,6 +95,7 @@ function App() {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
     setAddPlacePopupOpen(false);
+    setTooltipOpen(false);
     setSelectedCard({});
   }
   const handleUpdateUser = ({ name, about }) => {
@@ -193,9 +207,11 @@ function App() {
           onAddPlace={handleAddPlaceSubmit}
         />
 
-        <InfoTooltip 
-          isOpen='true'
-          />
+        <InfoTooltip
+          isOpen={isTooltipOpen}
+          onClose={closeAllPopups}
+          isSuccessful={isTooltipSuccessful}
+        />
 
       </div>
 
