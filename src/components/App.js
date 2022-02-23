@@ -7,7 +7,7 @@ import Main from './Main.js';
 import Footer from './Footer.js';
 import Login from './Login.js';
 import Register from './Register.js';
-//import InfoTooltip from './InfoTooltip.js';
+import InfoTooltip from './InfoTooltip.js';
 import ImagePopup from './ImagePopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -32,7 +32,8 @@ function App() {
   React.useEffect(() => {
     if (localStorage.getItem('jwt')) {
       const jwt = localStorage.getItem('jwt');
-      auth.checkToken(jwt).then((res) => {
+      auth.checkToken(jwt)
+      .then((res) => {
         if (res) {
           setLoggedIn(true);
         }
@@ -44,7 +45,7 @@ function App() {
     if (loggedIn) {
       navigate('/');
     }
-  }, [])
+  }, [loggedIn, navigate])
 
   const handleLogin = (formData) => {
     auth.authorize(formData.email, formData.password)
@@ -142,9 +143,6 @@ function App() {
       .catch((err) => console.log(err))
   }, [])
 
-
- 
-
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className='page'>
@@ -195,9 +193,9 @@ function App() {
           onAddPlace={handleAddPlaceSubmit}
         />
 
-        {/* <InfoTooltip 
+        <InfoTooltip 
           isOpen='true'
-          /> */}
+          />
 
       </div>
 
