@@ -18,6 +18,7 @@ function Register({ handleRegistration }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         handleRegistration(formData);
+        setFormData({ email: '', password: '' });
     }
 
     return (

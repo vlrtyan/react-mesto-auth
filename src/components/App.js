@@ -36,6 +36,7 @@ function App() {
   React.useEffect(() => {
     if (localStorage.getItem('jwt')) {
       const jwt = localStorage.getItem('jwt');
+      console.log(jwt)
       auth.checkToken(jwt)
         .then((res) => {
           if (res) {
@@ -54,7 +55,7 @@ function App() {
   const handleLogin = (formData) => {
     auth.authorize(formData.email, formData.password)
       .then((data) => {
-        localStorage.setItem('jwt', data.jwt);
+        localStorage.setItem('jwt', data.token);
         setLoggedIn(true);
         navigate('/');
         setUserEmail(formData.email);
@@ -76,6 +77,7 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
+        
         setTooltipSuccessful(false);
         setTooltipOpen(true);
       });

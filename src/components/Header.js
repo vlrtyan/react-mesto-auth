@@ -12,7 +12,7 @@ function Header(props) {
         {url === '/sign-in' && <Link
           className='header__button'
           to='/sign-up'>Регистрация</Link>}
-        {url === 'sign-up' && <Link
+        {url === '/sign-up' && <Link
           className='header__button'
           to='/sign-in'>Войти</Link>}
         {props.loggedIn && <button
