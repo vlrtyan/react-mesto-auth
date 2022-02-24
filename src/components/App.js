@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.js';
 
 import Header from './Header.js';
@@ -25,7 +25,9 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({});
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [userEmail, setUserEmail] = React.useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [currentUser, setCurrentUser] = React.useState({});
 
@@ -55,13 +57,14 @@ function App() {
         localStorage.setItem('jwt', data.jwt);
         setLoggedIn(true);
         navigate('/');
+        setUserEmail(formData.email);
       })
       .catch((err) => {
         console.log(err);
         setTooltipSuccessful(false);
         setTooltipOpen(true);
       });
-      
+
   }
 
   const handleRegistration = (formData) => {
@@ -76,6 +79,12 @@ function App() {
         setTooltipSuccessful(false);
         setTooltipOpen(true);
       });
+  }
+
+  const onLogout = () => {
+    setLoggedIn(false);
+    localStorage.removeItem('jwt');
+    navigate('/sign-in');
   }
 
   //отрисовка страницы
@@ -140,7 +149,6 @@ function App() {
         closeAllPopups()
       })
       .catch(err => console.log(err))
-
   }
 
   React.useEffect(() => {
@@ -160,9 +168,13 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className='page'>
-        <Header />
+        <Header
+          logout={loggedIn && onLogout}
+          userEmail={userEmail}
+          loggedIn={loggedIn}
+          url={location.pathname}
+        />
         <Routes>
-
           <Route path='/' element={
             <ProtectedRoute loggedIn={loggedIn}>
               <Main
