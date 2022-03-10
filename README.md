@@ -9,6 +9,6 @@
 4. Git
 5. API
 
-## Перейти на сайт можно по ссылке
+## Перейти на сайт можно по [ссылке](https://vlrtyan.github.io/react-mesto-auth/)
 
 
